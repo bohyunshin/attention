@@ -48,7 +48,7 @@ class Encoder(nn.Module):
         super().__init__()
 
         self.src_word_emb = nn.Embedding(n_src_vocab, d_word_vec, padding_idx=pad_idx)
-        self.position_enc = PositionalEncoding()
+        self.position_enc = PositionalEncoding(d_word_vec, n_position)
         self.dropout = nn.Dropout(p=dropout)
         self.layer_stack = nn.ModuleList(
             [EncoderLayer() for _ in range(n_layers)]

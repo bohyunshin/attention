@@ -4,6 +4,7 @@ from attention.models.transformer import PositionalEncoding
 from attention.modules.scaled_dot_product_attention import ScaledDotProductAttention
 from attention.modules.multi_head_attention import MultiHeadAttention
 from attention.sublayers.transformer import PositionwiseFeedForwrd
+from attention.layers.transformer import EncoderLayer, DecoderLayer
 
 def test_positional_encoding_shape():
     d_hid = 512
@@ -72,6 +73,57 @@ def test_positionwise_feedfowrd_shape():
     output = pff(x)
 
     asserting((seq_len, d_in), output.shape)
+
+def test_encoder_shape():
+    d_model = 512
+    d_inner = 256
+    n_head = 8
+    d_k = int(d_model // n_head)
+    d_v = d_k
+    dropout = 0.1
+    batch_size = 1
+    seq_len = 200
+    x = torch.rand((batch_size, seq_len, d_model))
+    encoder_layer = EncoderLayer(
+        d_model=d_model,
+        d_inner=d_inner,
+        n_head=n_head,
+        d_k=d_k,
+        d_v=d_v,
+        dropout=dropout
+    )
+    enc_output, enc_slf_attn = encoder_layer(x)
+
+    asserting((batch_size, seq_len, d_model), enc_output.shape)
+    asserting((batch_size, n_head, seq_len, seq_len), enc_slf_attn.shape)
+
+def test_decoder_shape():
+    d_model = 512
+    d_inner = 256
+    n_head = 8
+    d_k = int(d_model // n_head)
+    d_v = d_k
+    dropout = 0.1
+    batch_size = 1
+    seq_len = 200
+    dec_input = torch.rand((batch_size, seq_len, d_model))
+    enc_output = torch.rand((batch_size, seq_len, d_model))
+    decoder_layer = DecoderLayer(
+        d_model=d_model,
+        d_inner=d_inner,
+        n_head=n_head,
+        d_k=d_k,
+        d_v=d_v,
+        dropout=dropout
+    )
+    dec_output, dec_slf_attn, dec_enc_attn = decoder_layer(
+        dec_input=dec_input,
+        enc_output=enc_output
+    )
+
+    asserting((batch_size, seq_len, d_model), dec_output.shape)
+    asserting((batch_size, n_head, seq_len, seq_len), dec_slf_attn.shape)
+    asserting((batch_size, n_head, seq_len, seq_len), dec_enc_attn.shape)
 
 def asserting(expected, result):
     assert result == expected, f"Expected {expected}, got {result} instead"

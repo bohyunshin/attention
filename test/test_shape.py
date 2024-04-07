@@ -3,6 +3,7 @@ import numpy as np
 from attention.models.transformer import PositionalEncoding
 from attention.modules.scaled_dot_product_attention import ScaledDotProductAttention
 from attention.modules.multi_head_attention import MultiHeadAttention
+from attention.sublayers.transformer import PositionwiseFeedForwrd
 
 def test_positional_encoding_shape():
     d_hid = 512
@@ -56,6 +57,21 @@ def test_multi_head_attention_shape():
     )
 
     asserting((batch_size, seq_len, d_emb), mha(q, k, v)[0].shape)
+
+def test_positionwise_feedfowrd_shape():
+    d_in = 512
+    d_hid = 256
+    seq_len = 200
+    dropout = 0.1
+    x = torch.rand((seq_len, d_in))
+    pff = PositionwiseFeedForwrd(
+        d_in=d_in,
+        d_hid=d_hid,
+        dropout=dropout
+    )
+    output = pff(x)
+
+    asserting((seq_len, d_in), output.shape)
 
 def asserting(expected, result):
     assert result == expected, f"Expected {expected}, got {result} instead"

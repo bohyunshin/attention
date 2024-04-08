@@ -152,7 +152,7 @@ class Decoder(nn.Module):
         dec_output = self.dropout(self.position_enc(dec_output))
         dec_output = self.layer_norm(dec_output)
 
-        for dec_layer in self.layer_stack:
+        for i,dec_layer in enumerate(self.layer_stack):
             dec_output, dec_slf_attn, dec_enc_attn = dec_layer(
                 dec_input=dec_output,
                 enc_output=enc_output,
@@ -203,7 +203,7 @@ class Transformer(nn.Module):
             d_v=d_v,
             d_model=d_model,
             d_inner=d_inner,
-            pad_idx=pad_idx,
+            pad_idx=src_pad_idx,
             dropout=dropout,
             n_position=n_position,
             scale_emb=False
@@ -218,7 +218,7 @@ class Transformer(nn.Module):
             d_v=d_v,
             d_model=d_model,
             d_inner=d_inner,
-            pad_idx=pad_idx,
+            pad_idx=trg_pad_idx,
             n_position=n_position,
             dropout=dropout,
             scale_emb=False
@@ -253,7 +253,7 @@ class Transformer(nn.Module):
         return seq_logit.view(-1, seq_logit.size(2))
 
 if __name__ == "__main__":
-    word = torch.tensor([0,1,2,3,4])
+    word = torch.tensor([0,1,2,3,2998])
     n_src_vocab = 3000
     n = 512
     src_word_emb = nn.Embedding(n_src_vocab, n)

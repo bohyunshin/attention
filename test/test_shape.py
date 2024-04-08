@@ -5,6 +5,7 @@ from attention.modules.scaled_dot_product_attention import ScaledDotProductAtten
 from attention.modules.multi_head_attention import MultiHeadAttention
 from attention.sublayers.transformer import PositionwiseFeedForwrd
 from attention.layers.transformer import EncoderLayer, DecoderLayer
+from attention.models.transformer import Encoder, Decoder, get_pad_mask, get_subsequent_mask
 
 def test_positional_encoding_shape():
     d_hid = 512
@@ -74,7 +75,7 @@ def test_positionwise_feedfowrd_shape():
 
     asserting((seq_len, d_in), output.shape)
 
-def test_encoder_shape():
+def test_encoder_layer_shape():
     d_model = 512
     d_inner = 256
     n_head = 8
@@ -97,7 +98,7 @@ def test_encoder_shape():
     asserting((batch_size, seq_len, d_model), enc_output.shape)
     asserting((batch_size, n_head, seq_len, seq_len), enc_slf_attn.shape)
 
-def test_decoder_shape():
+def test_decoder_layer_shape():
     d_model = 512
     d_inner = 256
     n_head = 8
@@ -124,6 +125,40 @@ def test_decoder_shape():
     asserting((batch_size, seq_len, d_model), dec_output.shape)
     asserting((batch_size, n_head, seq_len, seq_len), dec_slf_attn.shape)
     asserting((batch_size, n_head, seq_len, seq_len), dec_enc_attn.shape)
+
+def test_encoder_shape():
+    n_src_vocab = 3000
+    d_word_vec = 512
+    n_layers = 6
+    n_head = 8
+    d_k = int(d_word_vec // n_head)
+    d_v = d_k
+    d_model = d_word_vec
+    d_inner = 256
+    pad_idx = 0
+    dropout = 0.1
+    n_positoin = 200
+    scale_emb=False
+    seq_len = 100
+    src_seq = torch.rand((batch_size, n_head, seq_len, d_k))
+    
+
+    encoder = Encoder(
+        n_src_vocab,
+        d_word_vec,
+        n_layers,
+        n_head,
+        d_k,
+        d_v,
+        d_model,
+        d_inner,
+        pad_idx,
+        dropout=dropout,
+        n_position=n_positoin,
+        scale_emb=scale_emb
+    )
+    
+    
 
 def asserting(expected, result):
     assert result == expected, f"Expected {expected}, got {result} instead"

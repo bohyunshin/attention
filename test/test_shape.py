@@ -1,3 +1,7 @@
+import os
+import sys
+sys.path.append(os.getcwd())
+
 import torch
 import numpy as np
 from attention.models.transformer import PositionalEncoding

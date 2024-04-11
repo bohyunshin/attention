@@ -1,6 +1,6 @@
 import torch.nn as nn
 import torch.nn.functional as F
-from modules.multi_head_attention import MultiHeadAttention as MultiHeadAttentionBase
+from attention.modules.multi_head_attention import MultiHeadAttention as MultiHeadAttentionBase
 
 
 class MultiHeadAttention(MultiHeadAttentionBase):

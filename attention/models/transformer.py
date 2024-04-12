@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import numpy as np
 from attention.layers.transformer import EncoderLayer, DecoderLayer
 
@@ -250,7 +251,8 @@ class Transformer(nn.Module):
         if self.scale_prj:
             seq_logit *= self.d_model ** (-0.5)
 
-        return seq_logit.view(-1, seq_logit.size(2))
+        return F.log_softmax(seq_logit.view(-1, seq_logit.size(2)), dim=-1)
+        # return seq_logit.view(-1, seq_logit.size(2))
 
 if __name__ == "__main__":
     word = torch.tensor([0,1,2,3,2998])

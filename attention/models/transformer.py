@@ -251,13 +251,4 @@ class Transformer(nn.Module):
         if self.scale_prj:
             seq_logit *= self.d_model ** (-0.5)
 
-        return F.log_softmax(seq_logit.view(-1, seq_logit.size(2)), dim=-1)
-        # return seq_logit.view(-1, seq_logit.size(2))
-
-if __name__ == "__main__":
-    word = torch.tensor([0,1,2,3,2998])
-    n_src_vocab = 3000
-    n = 512
-    src_word_emb = nn.Embedding(n_src_vocab, n)
-    emb = src_word_emb(word)
-    print(src_word_emb(word))
+        return seq_logit.view(-1, seq_logit.size(2))

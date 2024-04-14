@@ -85,6 +85,7 @@ python3 transformer/train.py \
 	--n_warmup_steps 128000 \
 	--epoch 400
 ```
+<details><summary>Parameter explanations</summary>
 
 |Parameter name|Explanation|
 |---|---|
@@ -104,6 +105,7 @@ python3 transformer/train.py \
 |`no_cuda`|Whether use cuda or not|
 |`n_warmup_steps`|Warmup steps before training|
 |`epoch`|number of epochs|
+</details>
 
 ## How to run pytest
 ```

@@ -3,10 +3,12 @@ import argparse
 def parse_args():
     parser = argparse.ArgumentParser()
 
+    parser.add_argument('--language_model', default='transformer')
+
     parser.add_argument('--data_pkl', default=None)  # all-in-1 data pickle or bpe field
 
     parser.add_argument('--epoch', type=int, default=10)
-    parser.add_argument('--b', '--batch_size', type=int, default=2048)
+    parser.add_argument('--batch_size', type=int, default=2048)
 
     parser.add_argument('--d_model', type=int, default=512)
     parser.add_argument('--d_word_vec', type=int, default=512)
@@ -16,7 +18,7 @@ def parse_args():
 
     parser.add_argument('--n_head', type=int, default=8)
     parser.add_argument('--n_layers', type=int, default=6)
-    parser.add_argument('--warmup', '--n_warmup_steps', type=int, default=4000)
+    parser.add_argument('--n_warmup_steps', type=int, default=4000)
     parser.add_argument('--lr_mul', type=float, default=2.0)
     parser.add_argument('--seed', type=int, default=None)
 

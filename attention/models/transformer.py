@@ -185,7 +185,8 @@ class Transformer(nn.Module):
                  n_position=200,
                  trg_emb_prj_weight_sharing=True,
                  emb_src_trg_weight_sharing=True,
-                 scale_emb_or_prj='prj'
+                 scale_emb_or_prj='prj',
+                 **kwargs
                  ):
         super().__init__()
         self.src_pad_idx, self.trg_pad_idx = src_pad_idx, trg_pad_idx

@@ -246,21 +246,27 @@ def main():
     print(opt)
 
     transformer = Transformer(
-        opt.src_vocab_size,
-        opt.trg_vocab_size,
-        src_pad_idx=opt.src_pad_idx,
-        trg_pad_idx=opt.trg_pad_idx,
-        trg_emb_prj_weight_sharing=opt.proj_share_weight,
-        emb_src_trg_weight_sharing=opt.embs_share_weight,
-        d_k=opt.d_k,
-        d_v=opt.d_v,
-        d_model=opt.d_model,
-        d_word_vec=opt.d_word_vec,
-        d_inner=opt.d_inner_hid,
-        n_layers=opt.n_layers,
-        n_head=opt.n_head,
-        dropout=opt.dropout,
-        scale_emb_or_prj=opt.scale_emb_or_prj).to(device)
+        n_src_vocab=opt.src_vocab_size,
+        n_trg_vocab=opt.trg_vocab_size,
+        **vars(opt)
+    )
+
+    # transformer = Transformer(
+    #     opt.src_vocab_size,
+    #     opt.trg_vocab_size,
+    #     src_pad_idx=opt.src_pad_idx,
+    #     trg_pad_idx=opt.trg_pad_idx,
+    #     trg_emb_prj_weight_sharing=opt.proj_share_weight,
+    #     emb_src_trg_weight_sharing=opt.embs_share_weight,
+    #     d_k=opt.d_k,
+    #     d_v=opt.d_v,
+    #     d_model=opt.d_model,
+    #     d_word_vec=opt.d_word_vec,
+    #     d_inner=opt.d_inner_hid,
+    #     n_layers=opt.n_layers,
+    #     n_head=opt.n_head,
+    #     dropout=opt.dropout,
+    #     scale_emb_or_prj=opt.scale_emb_or_prj).to(device)
 
     optimizer = ScheduledOptim(
         optim.Adam(transformer.parameters(), betas=(0.9, 0.98), eps=1e-09),

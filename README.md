@@ -61,7 +61,7 @@ python3 transformer/train.py \
 
 |Models|Referred content|Run example|
 |---|---|---|
-|[Transformer](https://arxiv.org/abs/1706.03762)|[link](https://github.com/jadore801120/attention-is-all-you-need-pytorch)|(link)[#Transformer]|
+|[Transformer](https://arxiv.org/abs/1706.03762)|[link](https://github.com/jadore801120/attention-is-all-you-need-pytorch)|[link](#Transformer)|
 
 ### Transformer
 Should set `--language_model` parameter as `transformer`.

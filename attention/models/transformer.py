@@ -168,7 +168,7 @@ class Decoder(nn.Module):
         return dec_output,
 
 
-class Transformer(nn.Module):
+class Model(nn.Module):
     def __init__(self,
                  n_src_vocab,
                  n_trg_vocab,

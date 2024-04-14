@@ -9,10 +9,10 @@ import dill as pickle
 from tqdm import tqdm
 import numpy as np
 import random
+import importlib
 import os
 import sys
 sys.path.append(os.getcwd())
-# print(os.path.dirname(os.path.abspath(__file__)))
 
 import torch
 import torch.nn.functional as F
@@ -22,7 +22,6 @@ from torchtext.datasets import TranslationDataset
 
 from attention.tools.arg_parse import parse_args
 from attention.constants import PAD_WORD
-from attention.models.transformer import Transformer
 from attention.optimizer.scheduled_optimizer import ScheduledOptim
 
 __author__ = "Yu-Hsiang Huang"
@@ -237,7 +236,6 @@ def main():
               'the warmup stage ends with only little data trained.')
 
     device = torch.device('cuda' if opt.cuda else 'cpu')
-    device = "cpu"
 
     #========= Loading Dataset =========#
 
@@ -245,34 +243,18 @@ def main():
 
     print(opt)
 
-    transformer = Transformer(
+    model = importlib.import_module(f"attention.models.{opt.language_model}").Model
+    model = model(
         n_src_vocab=opt.src_vocab_size,
         n_trg_vocab=opt.trg_vocab_size,
         **vars(opt)
-    )
-
-    # transformer = Transformer(
-    #     opt.src_vocab_size,
-    #     opt.trg_vocab_size,
-    #     src_pad_idx=opt.src_pad_idx,
-    #     trg_pad_idx=opt.trg_pad_idx,
-    #     trg_emb_prj_weight_sharing=opt.proj_share_weight,
-    #     emb_src_trg_weight_sharing=opt.embs_share_weight,
-    #     d_k=opt.d_k,
-    #     d_v=opt.d_v,
-    #     d_model=opt.d_model,
-    #     d_word_vec=opt.d_word_vec,
-    #     d_inner=opt.d_inner_hid,
-    #     n_layers=opt.n_layers,
-    #     n_head=opt.n_head,
-    #     dropout=opt.dropout,
-    #     scale_emb_or_prj=opt.scale_emb_or_prj).to(device)
+    ).to(device)
 
     optimizer = ScheduledOptim(
-        optim.Adam(transformer.parameters(), betas=(0.9, 0.98), eps=1e-09),
+        optim.Adam(model.parameters(), betas=(0.9, 0.98), eps=1e-09),
         opt.lr_mul, opt.d_model, opt.n_warmup_steps)
 
-    train(transformer, training_data, validation_data, optimizer, device, opt)
+    train(model, training_data, validation_data, optimizer, device, opt)
 
 
 def prepare_dataloaders(opt, device):

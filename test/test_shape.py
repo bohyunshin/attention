@@ -9,7 +9,7 @@ from attention.modules.scaled_dot_product_attention import ScaledDotProductAtten
 from attention.modules.multi_head_attention import MultiHeadAttention
 from attention.sublayers.transformer import PositionwiseFeedForwrd
 from attention.layers.transformer import EncoderLayer, DecoderLayer
-from attention.models.transformer import Transformer,Encoder, Decoder, get_pad_mask, get_subsequent_mask
+from attention.models.transformer import Model as Transformer, Encoder, Decoder, get_pad_mask, get_subsequent_mask
 
 def test_positional_encoding_shape():
     d_hid = 512

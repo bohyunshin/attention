@@ -241,12 +241,7 @@ def main():
 
     #========= Loading Dataset =========#
 
-    if all((opt.train_path, opt.val_path)):
-        training_data, validation_data = prepare_dataloaders_from_bpe_files(opt, device)
-    elif opt.data_pkl:
-        training_data, validation_data = prepare_dataloaders(opt, device)
-    else:
-        raise
+    training_data, validation_data = prepare_dataloaders(opt, device)
 
     print(opt)
 
@@ -272,40 +267,6 @@ def main():
         opt.lr_mul, opt.d_model, opt.n_warmup_steps)
 
     train(transformer, training_data, validation_data, optimizer, device, opt)
-
-
-def prepare_dataloaders_from_bpe_files(opt, device):
-    batch_size = opt.batch_size
-    MIN_FREQ = 2
-    if not opt.embs_share_weight:
-        raise
-
-    data = pickle.load(open(opt.data_pkl, 'rb'))
-    MAX_LEN = data['settings'].max_len
-    field = data['vocab']
-    fields = (field, field)
-
-    def filter_examples_with_length(x):
-        return len(vars(x)['src']) <= MAX_LEN and len(vars(x)['trg']) <= MAX_LEN
-
-    train = TranslationDataset(
-        fields=fields,
-        path=opt.train_path,
-        exts=('.src', '.trg'),
-        filter_pred=filter_examples_with_length)
-    val = TranslationDataset(
-        fields=fields,
-        path=opt.val_path,
-        exts=('.src', '.trg'),
-        filter_pred=filter_examples_with_length)
-
-    opt.max_token_seq_len = MAX_LEN + 2
-    opt.src_pad_idx = opt.trg_pad_idx = field.vocab.stoi[PAD_WORD]
-    opt.src_vocab_size = opt.trg_vocab_size = len(field.vocab)
-
-    train_iterator = BucketIterator(train, batch_size=batch_size, device=device, train=True)
-    val_iterator = BucketIterator(val, batch_size=batch_size, device=device)
-    return train_iterator, val_iterator
 
 
 def prepare_dataloaders(opt, device):

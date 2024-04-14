@@ -4,3 +4,4 @@ test/.pytest_cache/
 venv/
 .data/
 .pytest_cache
+output/

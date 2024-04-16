@@ -3,5 +3,6 @@ test/.pytest_cache/
 .venv/
 venv/
 .data/
+data/
 .pytest_cache
 output/

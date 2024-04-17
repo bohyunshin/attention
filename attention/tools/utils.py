@@ -3,6 +3,18 @@ import torch
 from torchtext.data.metrics import bleu_score
 
 
+def get_pad_mask(seq, pad_idx):
+    return (seq != pad_idx).unsqueeze(-2)
+
+
+def get_subsequent_mask(seq):
+    sz_b, len_s = seq.size()
+    subsequent_mask = (1 - torch.triu(
+        torch.ones((1, len_s, len_s), device=seq.device), diagonal=1
+    )).bool()
+    return subsequent_mask
+
+
 def save_pkl(data, fname):
     with open(fname, "wb") as f:
         pickle.dump(data, f)

@@ -3,6 +3,7 @@ import sys
 sys.path.append(os.getcwd())
 
 import torch
+import torch.nn.functional as F
 import numpy as np
 from attention.models.transformer import PositionalEncoding
 from attention.modules.scaled_dot_product_attention import ScaledDotProductAttention
@@ -73,6 +74,7 @@ def test_positionwise_feedfoward_shape():
     pff = PositionwiseFeedForward(
         d_in=d_in,
         d_hid=d_hid,
+        activation=F.relu,
         dropout=dropout
     )
     output = pff(x)

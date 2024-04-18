@@ -7,7 +7,7 @@ import numpy as np
 from attention.models.transformer import PositionalEncoding
 from attention.modules.scaled_dot_product_attention import ScaledDotProductAttention
 from attention.modules.multi_head_attention import MultiHeadAttention
-from attention.sublayers.transformer import PositionwiseFeedForwrd
+from attention.modules.positionwise_feed_forward import PositionwiseFeedForward
 from attention.layers.transformer import EncoderLayer, DecoderLayer
 from attention.models.transformer import Model as Transformer, Encoder, Decoder, get_pad_mask, get_subsequent_mask
 
@@ -64,13 +64,13 @@ def test_multi_head_attention_shape():
 
     asserting((batch_size, seq_len, d_emb), mha(q, k, v)[0].shape)
 
-def test_positionwise_feedfowrd_shape():
+def test_positionwise_feedfoward_shape():
     d_in = 512
     d_hid = 256
     seq_len = 200
     dropout = 0.1
     x = torch.rand((seq_len, d_in))
-    pff = PositionwiseFeedForwrd(
+    pff = PositionwiseFeedForward(
         d_in=d_in,
         d_hid=d_hid,
         dropout=dropout

@@ -62,3 +62,7 @@ def greedy_decode(model, src, max_len, start_symbol, end_symbol):
         if next_word == end_symbol:
             break
     return ys
+
+
+def asserting(expected, result):
+    assert result == expected, f"Expected {expected}, got {result} instead"

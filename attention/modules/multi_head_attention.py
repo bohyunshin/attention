@@ -10,7 +10,6 @@ class MultiHeadAttention(nn.Module):
                  d_emb,
                  d_k,
                  d_v,
-                 add_norm=True,
                  dropout=0.1):
         super().__init__()
 
@@ -19,7 +18,6 @@ class MultiHeadAttention(nn.Module):
         self.n_head = n_head
         self.d_k = d_k
         self.d_v = d_v
-        self.add_norm = add_norm
 
         self.w_qs = nn.Linear(d_emb, n_head * d_k, bias=False)
         self.w_ks = nn.Linear(d_emb, n_head * d_k, bias=False)
@@ -27,10 +25,9 @@ class MultiHeadAttention(nn.Module):
 
         self.attention = ScaledDotProductAttention(temperature=np.power(d_k, 0.5))
 
-        if self.add_norm:
-            self.fc = nn.Linear(n_head * d_v, d_emb, bias=False)
-            self.dropout = nn.Dropout(p=dropout)
-            self.layer_norm = nn.LayerNorm(d_model, eps=1e-6)
+        self.fc = nn.Linear(n_head * d_v, d_emb, bias=False)
+        self.dropout = nn.Dropout(p=dropout)
+        self.layer_norm = nn.LayerNorm(d_model, eps=1e-6)
 
     def forward(self, q, k, v, mask=None):
         # q.shape, k.shape, v.shape = (batch_size, seq_len, d_emb)
@@ -58,10 +55,9 @@ class MultiHeadAttention(nn.Module):
         q = q.transpose(1,2).contiguous().view(batch_size, len_q, -1)
         # q.shape = (batch_size, seq_len, d_model)
 
-        if self.add_norm:
-            q = self.fc(q)
-            q = self.dropout(q)
-            q += residual
-            q = self.layer_norm(q)
+        q = self.fc(q)
+        q = self.dropout(q)
+        q += residual
+        q = self.layer_norm(q)
 
         return q, attn

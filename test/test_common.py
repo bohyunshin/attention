@@ -8,7 +8,7 @@ import numpy as np
 from attention.modules.scaled_dot_product_attention import ScaledDotProductAttention
 from attention.modules.multi_head_attention import MultiHeadAttention
 from attention.modules.positionwise_feed_forward import PositionwiseFeedForward
-from tools.utils import asserting
+from attention.tools.utils import asserting
 
 def test_scaled_dot_product_attention_shape():
     d_emb = 512

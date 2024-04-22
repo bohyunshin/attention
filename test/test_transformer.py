@@ -8,7 +8,7 @@ import numpy as np
 from attention.models.transformer import PositionalEncoding
 from attention.layers.transformer import EncoderLayer, DecoderLayer
 from attention.models.transformer import Model as Transformer, Encoder, Decoder, get_pad_mask, get_subsequent_mask
-from tools.utils import asserting
+from attention.tools.utils import asserting
 
 def test_positional_encoding_shape():
     d_hid = 512

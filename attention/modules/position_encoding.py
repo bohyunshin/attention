@@ -24,9 +24,7 @@ class PositionalEncoding(nn.Module):
 
         return torch.FloatTensor(sinusoid_table).unsqueeze(0)
 
-    def forward(self, x, add=True):
+    def forward(self, x):
         # self.pos_table.shape = (1, max_length, d_emb)
         # x.shape = (batch_size, seq_length, d_emb)
-        if add:
-            return x + self.pos_table[:, :x.size(1)].clone().detach()
-        return self.pos_table[:, :x.size(1)].clone().detach()
+        return x + self.pos_table[:, :x.size(1)].clone().detach()

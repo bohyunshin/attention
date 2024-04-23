@@ -44,34 +44,41 @@ class Encoder(nn.Module):
                 enc_slf_attn_list += [enc_slf_attn] if return_attns else []
         if return_attns:
             return enc_output, enc_slf_attn_list
-        return enc_output
+        return enc_output,
 
 
-class Model(nn.Module):
+class Bert(nn.Module):
     def __init__(self,
-                 n_head,
-                 d_model,
+                 n_vocab,
                  d_emb,
+                 d_model,
                  d_k,
                  d_v,
+                 n_head,
                  d_hid,
-                 activation=F.gelu,
-                 dropout=0.1):
+                 n_position,
+                 n_layers):
 
         super().__init__()
 
-        self.encoder = Encoder()
+        self.encoder = Encoder(
+            n_vocab=n_vocab,
+            d_emb=d_emb,
+            d_model=d_model,
+            d_k=d_k,
+            d_v=d_v,
+            n_head=n_head,
+            d_hid=d_hid,
+            n_position=n_position,
+            n_layers=n_layers
+        )
 
+    def forward(self, seq, segment_label):
 
-    def forward(self, x, segment_info):
-        mask = ()
+        mask = (seq > 0).unsqueeze(1)
+        enc_output, *_ = self.encoder(seq, segment_label, mask)
 
-        x = self.embedding(x, segment_info)
-
-        for encoder in self.encoder_blocks:
-            x = encoder.forward(x, mask)
-
-        return x
+        return enc_output
 
 
 class NextSentencePrediction(nn.Module):

@@ -12,8 +12,7 @@ class EncoderLayer(nn.Module):
                  d_v,
                  d_hid,
                  activation=F.gelu,
-                 dropout=0.1
-                 ):
+                 dropout=0.1):
         super().__init__()
 
         # dropout, layers normalization included

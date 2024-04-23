@@ -90,7 +90,10 @@ class NextSentencePrediction(nn.Module):
         self.softmax = nn.LogSoftmax(dim=-1)
 
     def forward(self, x):
-        return self.softmax(self.linear(x[:,0]))
+        # use only the first token which is the [CLS]
+        # x.shape = (batch_size, seq_len, d_model)
+        # to use only the first token, use x[:,0,:]
+        return self.softmax(self.linear(x[:,0,:]))
 
 
 class MaskedLanguageModel(nn.Module):
@@ -105,14 +108,33 @@ class MaskedLanguageModel(nn.Module):
         return self.softmax(self.linear(x))
 
 
-class BERTLM(nn.Module):
+class Model(nn.Module):
 
-    def __init__(self, bert, vocab_size):
+    def __init__(self,
+                 n_vocab,
+                 d_emb,
+                 d_model,
+                 d_k,
+                 d_v,
+                 n_head,
+                 d_hid,
+                 n_position,
+                 n_layers):
 
         super().__init__()
-        self.bert = bert
-        self.next_sentence = NextSentencePrediction(self.bert.d_model)
-        self.mask_lm = MaskedLanguageModel(self.bert.d_model, vocab_size)
+        self.bert = Bert(
+            n_vocab,
+            d_emb,
+            d_model,
+            d_k,
+            d_v,
+            n_head,
+            d_hid,
+            n_position,
+            n_layers
+        )
+        self.next_sentence = NextSentencePrediction(d_model)
+        self.mask_lm = MaskedLanguageModel(d_model, n_vocab)
 
     def forward(self, x, segment_label):
         x = self.bert(x, segment_label)

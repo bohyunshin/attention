@@ -9,10 +9,8 @@ from transformers import BertTokenizer
 import tqdm
 from torch.utils.data import Dataset, DataLoader
 import itertools
-import math
-import torch.nn.functional as F
-import numpy as np
-from torch.optim import Adam
+from attention.preprocess.preprocess_base import PreprocessBase
+
 
 import argparse
 
@@ -22,6 +20,7 @@ def parse_args():
     parser.add_argument("--movie_lines", required=False)
     parser.add_argument("--raw_text", required=False)
     parser.add_argument("--output", required=False)
+    parser.add_argument("--batch_size", required=False, type=int)
     args = parser.parse_args()
     return args
 
@@ -207,72 +206,63 @@ class BERTDataset:
         return self.lines[random.randrange(len(self.lines))][1]
 
 
-class Preprocess:
+class Preprocess(PreprocessBase):
     def __init__(self,
-                 seq_len,
+                 max_len,
                  movie_conversations,
                  movie_lines,
                  raw_text,
                  output,
-                 batch_size):
-        self.seq_len = seq_len
+                 **kwargs):
+        super().__init__()
+        self.seq_len = max_len
         self.movie_conversations = movie_conversations
         self.movie_lines = movie_lines
         self.raw_text = raw_text
         self.output = output
 
+    def preprocess_raw_data(self):
         with open(self.movie_conversations, 'r', encoding='iso-8859-1') as l:
             conv = l.readlines()
         n_test = int(len(conv) * 0.7)
         train_conv = conv[:n_test]
         val_conv = conv[n_test:]
 
-        self.train_data = DataLoader(
-            self.get_data(train_conv, "train"),
-            batch_size=batch_size,
-            shuffle=True,
-            pin_memory=True
-        )
-        self.val_data = DataLoader(
-            self.get_data(val_conv, "val"),
-            batch_size=batch_size,
-            shuffle=True,
-            pin_memory=True
-        )
-
-    def get_data(self, conv, mode):
-        bert_dataset = BERTDataset(
+        train_dataset = BERTDataset(
             self.seq_len,
-            conv,
+            train_conv,
             self.movie_lines,
             self.raw_text,
             self.output,
-            mode
+            "train"
         )
-        bert_dataset.train_tokenizer()
+        train_dataset.train_tokenizer()
 
-        return bert_dataset
+        validation_dataset = BERTDataset(
+            self.seq_len,
+            val_conv,
+            self.movie_lines,
+            self.raw_text,
+            self.output,
+            "val"
+        )
+        validation_dataset.train_tokenizer()
 
+        self.train_dataset = train_dataset
+        self.validation_dataset = validation_dataset
 
-if __name__ == "__main__":
-    args = parse_args()
+    def prepare_dataloader(self, arg, device):
+        train_dataloader = DataLoader(
+            self.train_dataset,
+            batch_size=arg.batch_size,
+            shuffle=True,
+            pin_memory=True
+        )
+        validation_dataloader = DataLoader(
+            self.validation_dataset,
+            batch_size=arg.batch_size,
+            shuffle=True,
+            pin_memory=True
+        )
 
-    preprocess = Preprocess(
-        64,
-        args.movie_conversations,
-        args.movie_lines,
-        args.raw_text,
-        args.output,
-        256
-    )
-
-    bert_dataset = BERTDataset(
-        64,
-        args.movie_conversations,
-        args.movie_lines,
-        args.raw_text,
-        args.output,
-        args.mode
-    )
-    bert_dataset.train_tokenizer()
-    print(bert_dataset[1])
+        return train_dataloader, validation_dataloader, arg

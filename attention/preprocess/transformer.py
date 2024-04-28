@@ -23,7 +23,8 @@ class Preprocess(PreprocessBase):
                  max_len,
                  min_word_count,
                  keep_case,
-                 share_vocab):
+                 share_vocab,
+                 **kwargs):
         super().__init__()
         self.lang_src = lang_src
         self.lang_trg = lang_trg

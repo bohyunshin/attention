@@ -38,17 +38,7 @@ if __name__ == "__main__":
 
     # preprocess step
     preprocessor_module = importlib.import_module(f"attention.preprocess.{args.language_model}").Preprocess
-    preprocessor = preprocessor_module(
-        lang_src=args.lang_src,
-        lang_trg=args.lang_trg,
-        save_data=args.save_data,
-        data_src=args.data_src,
-        data_trg=args.data_trg,
-        max_len=args.max_len,
-        min_word_count=args.min_word_count,
-        keep_case=args.keep_case,
-        share_vocab=args.share_vocab
-    )
+    preprocessor = preprocessor_module(**vars(args))
     preprocessor.preprocess_raw_data()
 
     # prepare data_loader

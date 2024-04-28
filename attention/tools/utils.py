@@ -1,7 +1,10 @@
-import pickle
+import dill as pickle
 import time
 import torch
 from torchtext.data.metrics import bleu_score
+
+from torchtext.data import Dataset, BucketIterator
+from attention.constants import PAD_WORD
 
 
 def get_pad_mask(seq, pad_idx):
@@ -74,3 +77,33 @@ def print_performances(header, ppl, accu, start_time, lr):
           "elapse: {elapse:3.3f} min".format(
               header=f"({header})", ppl=ppl,
               accu=100*accu, elapse=(time.time()-start_time)/60, lr=lr))
+
+
+def prepare_dataloaders(model, arg, device):
+    if model == "transformer":
+        batch_size = arg.batch_size
+        data = pickle.load(open(arg.data_pkl, "rb"))
+
+        arg.max_token_seq_len = data["settings"].max_len
+        arg.src_pad_idx = data["vocab"]["src"].vocab.stoi[PAD_WORD]
+        arg.trg_pad_idx = data["vocab"]["trg"].vocab.stoi[PAD_WORD]
+
+        arg.n_src_vocab = len(data["vocab"]["src"].vocab)
+        arg.n_trg_vocab = len(data["vocab"]["trg"].vocab)
+
+        # ========= Preparing Model =========#
+        if arg.embs_share_weight:
+            assert data["vocab"]["src"].vocab.stoi == data["vocab"]["trg"].vocab.stoi, \
+                "To sharing word embedding the src/trg word2idx table shall be the same."
+
+        fields = {"src": data["vocab"]["src"], "trg": data["vocab"]["trg"]}
+
+        train = Dataset(examples=data["train"], fields=fields)
+        val = Dataset(examples=data["valid"], fields=fields)
+
+        train_iterator = BucketIterator(train, batch_size=batch_size, device=device, train=True)
+        val_iterator = BucketIterator(val, batch_size=batch_size, device=device)
+
+        return train_iterator, val_iterator, arg
+    elif model == "bert":
+        return

@@ -1,4 +1,5 @@
 import torch
+import torch.optim as optim
 from abc import abstractmethod
 from tqdm import tqdm
 import importlib
@@ -7,19 +8,22 @@ import math
 import os
 
 from attention.tools.utils import print_performances
+from attention.optimizer.scheduled_optimizer import ScheduledOptim
 
 
 class TrainBase:
     def __init__(self,
                  model_name,
-                 optimizer,
                  epoch,
                  arg,
                  device):
         # init model
         model = importlib.import_module(f"attention.models.{model_name}").Model
-        self.model = model(**arg).to(device)
-        self.optimizer = optimizer
+        self.model = model(**vars(arg)).to(device)
+        self.optimizer = ScheduledOptim(
+            optim.Adam(self.model.parameters(), betas=(0.9, 0.98), eps=1e-09),
+            arg.lr_mul, arg.d_model, arg.n_warmup_steps
+        )
         self.epoch = epoch
         self.arg = arg
         self.device = device
@@ -35,10 +39,6 @@ class TrainBase:
     @abstractmethod
     def get_data_from_batch(self, src, trg, src_pad_idx, trg_pad_idx, device):
         raise ValueError("get_data_from_batch method should be implemented")
-
-    @abstractmethod
-    def prepare_dataloaders(self, arg, device):
-        raise ValueError("prepare_dataloaders should be implemented")
 
     def train_epoch(self, train_data):
         # set train mode

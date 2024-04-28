@@ -22,7 +22,6 @@ def parse_args():
     parser.add_argument("--movie_lines", required=False)
     parser.add_argument("--raw_text", required=False)
     parser.add_argument("--output", required=False)
-    parser.add_argument("--tokenizer", required=False)
     args = parser.parse_args()
     return args
 
@@ -34,22 +33,24 @@ class BERTDataset:
                  movie_conversations,
                  movie_lines,
                  raw_text,
-                 output):
+                 output,
+                 mode):
         self.seq_len = seq_len
-        self.movie_conversations = movie_conversations
+        # self.movie_conversations = movie_conversations
         self.movie_lines = movie_lines
         self.raw_text = raw_text
         self.output = output
-        conv, lines = self.load_data()
-        self.make_sentence_pair(conv, lines)
+        self.mode = mode
+        lines = self.load_data()
+        self.make_sentence_pair(movie_conversations, lines)
         self.make_text_file()
 
     def load_data(self):
-        with open(self.movie_conversations, 'r', encoding='iso-8859-1') as c:
-            conv = c.readlines()
+        # with open(self.movie_conversations, 'r', encoding='iso-8859-1') as c:
+        #     conv = c.readlines()
         with open(self.movie_lines, 'r', encoding='iso-8859-1') as l:
             lines = l.readlines()
-        return conv, lines
+        return lines
 
     def make_sentence_pair(self, conv, lines):
         ### splitting text using special lines
@@ -85,7 +86,7 @@ class BERTDataset:
 
             # once we hit the 10K mark, save to file
             if len(text_data) == 10000:
-                with open(os.path.join(self.raw_text, f"text_{file_count}.txt"), 'w', encoding='utf-8') as fp:
+                with open(os.path.join(self.raw_text, self.mode, f"text_{file_count}.txt"), 'w', encoding='utf-8') as fp:
                     fp.write('\n'.join(text_data))
                 text_data = []
                 file_count += 1
@@ -110,9 +111,11 @@ class BERTDataset:
             special_tokens=['[PAD]', '[CLS]', '[SEP]', '[MASK]', '[UNK]']
         )
 
-        tokenizer.save_model(self.output, 'bert')
-        self.tokenizer = BertTokenizer.from_pretrained(os.path.join(self.output, "bert-vocab.txt"), local_files_only=True)
+        tokenizer.save_model(os.path.join(self.output, self.mode), 'bert')
+        self.tokenizer = BertTokenizer.from_pretrained(os.path.join(self.output, self.mode, "bert-vocab.txt"), local_files_only=True)
 
+    def __len__(self):
+        return len(self.lines)
 
     def __getitem__(self, item):
         # step 1: get random sentence pair, either negative or positive (saved as is_next_label)
@@ -204,8 +207,64 @@ class BERTDataset:
         return self.lines[random.randrange(len(self.lines))][1]
 
 
+class Preprocess:
+    def __init__(self,
+                 seq_len,
+                 movie_conversations,
+                 movie_lines,
+                 raw_text,
+                 output,
+                 batch_size):
+        self.seq_len = seq_len
+        self.movie_conversations = movie_conversations
+        self.movie_lines = movie_lines
+        self.raw_text = raw_text
+        self.output = output
+
+        with open(self.movie_conversations, 'r', encoding='iso-8859-1') as l:
+            conv = l.readlines()
+        n_test = int(len(conv) * 0.7)
+        train_conv = conv[:n_test]
+        val_conv = conv[n_test:]
+
+        self.train_data = DataLoader(
+            self.get_data(train_conv, "train"),
+            batch_size=batch_size,
+            shuffle=True,
+            pin_memory=True
+        )
+        self.val_data = DataLoader(
+            self.get_data(val_conv, "val"),
+            batch_size=batch_size,
+            shuffle=True,
+            pin_memory=True
+        )
+
+    def get_data(self, conv, mode):
+        bert_dataset = BERTDataset(
+            self.seq_len,
+            conv,
+            self.movie_lines,
+            self.raw_text,
+            self.output,
+            mode
+        )
+        bert_dataset.train_tokenizer()
+
+        return bert_dataset
+
+
 if __name__ == "__main__":
     args = parse_args()
+
+    preprocess = Preprocess(
+        64,
+        args.movie_conversations,
+        args.movie_lines,
+        args.raw_text,
+        args.output,
+        256
+    )
 
     bert_dataset = BERTDataset(
         64,
@@ -213,7 +272,7 @@ if __name__ == "__main__":
         args.movie_lines,
         args.raw_text,
         args.output,
-        args.tokenizer
+        args.mode
     )
     bert_dataset.train_tokenizer()
-    bert_dataset[1]
+    print(bert_dataset[1])

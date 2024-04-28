@@ -34,6 +34,19 @@ def parse_args():
     parser.add_argument('--no_cuda', action='store_true')
     parser.add_argument('--label_smoothing', action='store_true')
 
+    # preprocess related
+    spacy_support_langs = ['de', 'el', 'en', 'es', 'fr', 'it', 'lt', 'nb', 'nl', 'pt']
+    parser.add_argument('--lang_src', required=True, choices=spacy_support_langs)
+    parser.add_argument('--lang_trg', required=True, choices=spacy_support_langs)
+    parser.add_argument('--save_data', required=True)
+    parser.add_argument('--data_src', type=str, default=None)
+    parser.add_argument('--data_trg', type=str, default=None)
+
+    parser.add_argument('--max_len', type=int, default=100)
+    parser.add_argument('--min_word_count', type=int, default=3)
+    parser.add_argument('--keep_case', action='store_true')
+    parser.add_argument('--share_vocab', action='store_true')
+
     args = parser.parse_args()
     args.cuda = not args.no_cuda
 

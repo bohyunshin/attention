@@ -36,9 +36,24 @@ if __name__ == "__main__":
 
     device = torch.device("cuda" if args.cuda else "cpu")
 
+    # preprocess step
+    preprocessor_module = importlib.import_module(f"attention.preprocess.{args.language_model}").Preprocess
+    preprocessor = preprocessor_module(
+        lang_src=args.lang_src,
+        lang_trg=args.lang_trg,
+        save_data=args.save_data,
+        data_src=args.data_src,
+        data_trg=args.data_trg,
+        max_len=args.max_len,
+        min_word_count=args.min_word_count,
+        keep_case=args.keep_case,
+        share_vocab=args.share_vocab
+    )
+    preprocessor.preprocess_raw_data()
+
     # prepare data_loader
     print(args)
-    training_data, validation_data, args = prepare_dataloaders(args.language_model, args, device)
+    training_data, validation_data, args = preprocessor.prepare_dataloader(args, device)
 
     # prepare trainer
     trainer_module = importlib.import_module(f"attention.train.{args.language_model}").Train

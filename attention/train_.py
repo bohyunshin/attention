@@ -237,8 +237,8 @@ def main():
 
     model = importlib.import_module(f"attention.models.{opt.language_model}").Model
     model = model(
-        n_src_vocab=opt.src_vocab_size,
-        n_trg_vocab=opt.trg_vocab_size,
+        # n_src_vocab=opt.src_vocab_size,
+        # n_trg_vocab=opt.trg_vocab_size,
         **vars(opt)
     ).to(device)
 
@@ -257,8 +257,8 @@ def prepare_dataloaders(opt, device):
     opt.src_pad_idx = data["vocab"]["src"].vocab.stoi[PAD_WORD]
     opt.trg_pad_idx = data["vocab"]["trg"].vocab.stoi[PAD_WORD]
 
-    opt.src_vocab_size = len(data["vocab"]["src"].vocab)
-    opt.trg_vocab_size = len(data["vocab"]["trg"].vocab)
+    opt.n_src_vocab = len(data["vocab"]["src"].vocab)
+    opt.n_trg_vocab = len(data["vocab"]["trg"].vocab)
 
     #========= Preparing Model =========#
     if opt.embs_share_weight:

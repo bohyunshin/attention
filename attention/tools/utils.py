@@ -1,4 +1,5 @@
 import pickle
+import time
 import torch
 from torchtext.data.metrics import bleu_score
 
@@ -66,3 +67,10 @@ def greedy_decode(model, src, max_len, start_symbol, end_symbol):
 
 def asserting(expected, result):
     assert result == expected, f"Expected {expected}, got {result} instead"
+
+
+def print_performances(header, ppl, accu, start_time, lr):
+    print("  - {header:12} ppl: {ppl: 8.5f}, accuracy: {accu:3.3f} %, lr: {lr:8.5f}, "\
+          "elapse: {elapse:3.3f} min".format(
+              header=f"({header})", ppl=ppl,
+              accu=100*accu, elapse=(time.time()-start_time)/60, lr=lr))

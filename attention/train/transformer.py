@@ -4,7 +4,6 @@ import torch.nn.functional as F
 from attention.train.train_base import TrainBase
 
 
-
 class Train(TrainBase):
     def __init__(self,
                  model_name,

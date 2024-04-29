@@ -30,8 +30,11 @@ sympy==1.12
 thinc==7.4.6
 tomli==2.0.1
 torch==2.2.1
-torchtext==0.4.0
+torchtext==0.6.0
 tqdm==4.66.2
 typing_extensions==4.11.0
 urllib3==2.2.1
 wasabi==0.10.1
+transformers
+tokenizers
+datasets

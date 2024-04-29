@@ -21,5 +21,6 @@ class Train(TrainBase):
     def cal_performance(self, pred, gold):
         pass
 
-    def get_data_from_batch(self, src, trg, src_pad_idx, trg_pad_idx, device):
-        pass
+    def get_data_from_batch(self, batch, arg, device):
+        data = {key: value.to(self.device) for key, value in batch.items()}
+        return data, data, data

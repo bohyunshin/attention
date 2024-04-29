@@ -18,7 +18,8 @@ class Encoder(nn.Module):
                  pad_idx,
                  dropout=0.1,
                  n_position=200,
-                 scale_emb=False):
+                 scale_emb=False,
+                 **kwargs):
         super().__init__()
 
         self.src_word_emb = nn.Embedding(

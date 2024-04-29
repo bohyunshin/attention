@@ -112,24 +112,25 @@ class Model(nn.Module):
 
     def __init__(self,
                  n_vocab,
-                 d_emb,
-                 d_model,
-                 d_k,
-                 d_v,
-                 n_head,
-                 d_hid,
-                 n_position,
-                 n_layers):
+                 d_word_vec=512,
+                 d_model=512,
+                 d_k=64,
+                 d_v=64,
+                 n_head=8,
+                 d_inner=2048,
+                 n_position=200,
+                 n_layers=6,
+                 **kwargs):
 
         super().__init__()
         self.bert = Bert(
             n_vocab,
-            d_emb,
+            d_word_vec,
             d_model,
             d_k,
             d_v,
             n_head,
-            d_hid,
+            d_inner,
             n_position,
             n_layers
         )

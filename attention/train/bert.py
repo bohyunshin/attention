@@ -16,9 +16,12 @@ class Train(TrainBase):
 
     def cal_loss(self, pred, gold):
         next_sent_output, mask_lm_output = pred
+        # next_sent_output.shape, mask_lm_output.shape = (batch_size, 2), (batch_size, seq_len, n_vocab)
+        # gold["is_next"].shape, gold["bert_label"] = (batch_size, ), (batch_size, seq_len)
+        # we should transpose mask_lm_output to compute nllloss w.r.t. gold["bert_label"]
 
         next_loss = self.criterion(next_sent_output, gold["is_next"])
-        mask_loss = self.criterion(mask_lm_output, gold["bert_label"])
+        mask_loss = self.criterion(mask_lm_output.transpose(1,2), gold["bert_label"])
         return next_loss + mask_loss
 
     def cal_performance(self, pred, gold):

@@ -10,34 +10,25 @@ Implements attention based language models in a unified structure, assuring code
 pip3 install -r requirements.txt
 ```
 
-### Download spacy vocab
+### Prepare dataset
+First download related spacy language model
 ```bash
 python -m spacy download en
 python -m spacy download de
 ```
 
-### Download train, validation, test dataset
-Following bash file downloads `Multi30k` dataset to `./.data/multi30k` directory.
+Then, download related datasets of each attention model. Currently, `transformer`, `bert` are supported.
 ```bash
-sh download.sh
+sh download.sh ${model}
 ```
 
-### Preprocess dataset
-Following script will make pickle file to `../.data/multi30k/m30k_deen_shr.pkl`
-```bash
-python3 attention/preprocess/preprocess.py \
-	--lang_src de \
-	--lang_trg en \
-	--share_vocab \
-	--save_data ../.data/multi30k/m30k_deen_shr.pkl
-```
 
 ### Run language model
-You can run implemented language models using `attention/train.py` file. Example of training `transformer` model is given below.
+You can run implemented language models using `attention/run_attention_model.py` file. Example of training `transformer` model is given below.
 
 Detailed parameters of each models are given in next section.
 ```bash
-python3 transformer/train.py \
+python3 transformer/run_attention_model.py \
 	--language_model transformer \
 	--data_pkl .data/multi30k/m30k_deen_shr.pkl \
 	--d_model 512 \
@@ -57,16 +48,19 @@ python3 transformer/train.py \
 	--epoch 400
 ```
 
+Currently, `transformer`, `bert` models are supported. To see the related arguments of each model, see below.
+
 ## List of implemented models and related parameters
 
 |Models|Referred content|Run example|
 |---|---|---|
 |[Transformer](https://arxiv.org/abs/1706.03762)|[link](https://github.com/jadore801120/attention-is-all-you-need-pytorch)|[link](#Transformer)|
+|[Bert](https://arxiv.org/pdf/1810.04805)|[link](https://github.com/codertimo/BERT-pytorch)|[link](#Bert)|
 
 ### Transformer
 Should set `--language_model` parameter as `transformer`.
 ```bash
-python3 transformer/train.py \
+python3 attention/run_attention_model.py \
 	--language_model transformer \
 	--data_pkl .data/multi30k/m30k_deen_shr.pkl \
 	--d_model 512 \
@@ -105,6 +99,49 @@ python3 transformer/train.py \
 |`no_cuda`|Whether use cuda or not|
 |`n_warmup_steps`|Warmup steps before training|
 |`epoch`|number of epochs|
+</details>
+
+### Bert
+Should set `--language_model` parameter as `Bert`.
+```bash
+python3 attention/run_attention_model.py \
+    --language_model bert \
+    --d_model 512 \
+    --d_word_vec 512 \
+    --d_inner_hid 2048 \
+    --d_k 64 \
+    --d_v 64 \
+    --n_head 8 \
+    --n_layers 6 \
+    --batch_size 256 \
+    --output_dir output \
+    --no_cuda \
+    --epoch 400 \
+    --movie_conversations ./data/movie_conversations.txt \
+    --movie_lines ./data/movie_lines.txt \
+    --raw_text ./data \
+    --output ./data
+```
+
+<details><summary>Parameter explanations</summary>
+
+|Parameter name|Explanation|
+|---|---|
+|`language_model`|Name of `bert`|
+|`d_model`|Projection dimension of `q,k,v`|
+|`d_word_vec`|Dimension of word vectors|
+|`d_inner_hid`|Inner dimension when `feedforward network` is done|
+|`d_k`|`d_model=d_k * n_head`|
+|`d_v`|`d_model=d_v * n_head`|
+|`n_head`|Number of multi-head attention|
+|`batch_size`|Size of a batch|
+|`no_cuda`|Whether use cuda or not|
+|`n_warmup_steps`|Warmup steps before training|
+|`epoch`|number of epochs|
+|`movie_conversations`|Directory where `movie_conversations.txt` exists|
+|`movie_lines`|Directory where `movie_lines.txt` exists|
+|`raw_text`|Directory where preprocessed text will be saved|
+|`output`|Directory where results will be saved|
 </details>
 
 ## How to run pytest

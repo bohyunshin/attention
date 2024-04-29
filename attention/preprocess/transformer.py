@@ -1,6 +1,4 @@
 import os
-os.chdir(os.path.join(os.path.dirname(os.path.abspath(__file__)),".."))
-
 import sys
 sys.path.append(os.getcwd())
 
@@ -69,7 +67,7 @@ class Preprocess(PreprocessBase):
         train, val, test = torchtext.datasets.Multi30k.splits(
             exts=('.' + self.lang_src, '.' + self.lang_trg),
             fields=(SRC, TRG),
-            root="../.data",
+            root="./.data",
             filter_pred=filter_examples_with_length
         )
 

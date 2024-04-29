@@ -5,6 +5,7 @@ import importlib
 import torch
 import sys
 sys.path.append(os.getcwd())
+os.chdir(os.path.join(os.path.dirname(os.path.abspath(__file__)),".."))
 
 from attention.tools.arg_parse import parse_args
 

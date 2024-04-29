@@ -52,7 +52,11 @@ class Train(TrainBase):
         # batch.trg.shape = (trg_seq_len, batch_size)
         src_seq = self.patch_src(batch.src, arg.src_pad_idx).to(device)
         trg_seq, gold = map(lambda x: x.to(device), self.patch_trg(batch.trg, arg.trg_pad_idx))
-        return src_seq, trg_seq, gold
+        model_input = {
+            "src_seq":src_seq,
+            "trg_seq":trg_seq
+        }
+        return model_input, gold
 
     def patch_src(self, src, pad_idx):
         # src.shape = (seq_len, batch_size)

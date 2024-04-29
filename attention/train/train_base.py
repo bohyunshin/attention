@@ -46,11 +46,7 @@ class TrainBase:
         total_loss, n_word_total, n_word_correct = 0, 0, 0
 
         for batch in tqdm(train_data, mininterval=2):
-            src_seq, trg_seq, gold = self.get_data_from_batch(batch, self.arg, self.device)
-            model_input = {
-                "src_seq": src_seq,
-                "trg_seq": trg_seq
-            }
+            model_input, gold = self.get_data_from_batch(batch, self.arg, self.device)
 
             # forward
             self.optimizer.zero_grad()
@@ -78,11 +74,10 @@ class TrainBase:
 
         with torch.no_grad():
             for batch in tqdm(validation_data, mininterval=2):
-                src_seq, trg_seq, gold = self.get_data_from_batch(batch.src, batch.trg, self.arg.src_pad_idx,
-                                                                  self.arg.trg_pad_idx, self.device)
+                model_input, gold = self.get_data_from_batch(batch, self.arg, self.device)
 
                 # forward
-                pred = self.model(src_seq, trg_seq)
+                pred = self.model(**model_input)
                 loss, n_correct, n_word = self.cal_performance(pred, gold)
 
                 # note keeping

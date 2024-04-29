@@ -9,14 +9,13 @@ class MultiHeadAttention(MultiHeadAttentionBase):
                  d_emb,
                  d_k,
                  d_v,
-                 dropout=0.1):
+                 dropout):
         super().__init__(n_head,
                          d_model,
                          d_emb,
                          d_k,
                          d_v,
-                         dropout=dropout)
-
+                         dropout)
 
 
 class PositionwiseFeedForward(PositionwiseFeedForwardBase):

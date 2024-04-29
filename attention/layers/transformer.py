@@ -1,5 +1,6 @@
 import torch.nn as nn
-from attention.sublayers.transformer import MultiHeadAttention, PositionwiseFeedForwrd
+import torch.nn.functional as F
+from attention.sublayers.transformer import MultiHeadAttention, PositionwiseFeedForward
 
 
 class EncoderLayer(nn.Module):
@@ -19,9 +20,10 @@ class EncoderLayer(nn.Module):
             d_v=d_v,
             dropout=dropout
         )
-        self.pos_ffn = PositionwiseFeedForwrd(
+        self.pos_ffn = PositionwiseFeedForward(
             d_in=d_model,
             d_hid=d_inner,
+            activation=F.relu,
             dropout=dropout
         )
 
@@ -61,9 +63,10 @@ class DecoderLayer(nn.Module):
             d_v=d_v,
             dropout=dropout
         )
-        self.pos_ffn = PositionwiseFeedForwrd(
+        self.pos_ffn = PositionwiseFeedForward(
             d_in=d_model,
             d_hid=d_inner,
+            activation=F.relu,
             dropout=dropout
         )
 

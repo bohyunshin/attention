@@ -7,7 +7,6 @@ import sys
 sys.path.append(os.getcwd())
 
 from attention.tools.arg_parse import parse_args
-from attention.tools.utils import prepare_dataloaders
 
 
 if __name__ == "__main__":

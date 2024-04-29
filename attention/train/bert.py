@@ -1,3 +1,4 @@
+import torch
 from attention.train.train_base import TrainBase
 
 
@@ -11,9 +12,11 @@ class Train(TrainBase):
                          epoch=epoch,
                          arg=arg,
                          device=device)
+        self.criterion = torch.nn.NLLLoss(ignore_index=0)
 
     def cal_loss(self, pred, gold):
-        pass
+        loss = self.criterion(pred, gold)
+        return loss
 
     def cal_performance(self, pred, gold):
         pass

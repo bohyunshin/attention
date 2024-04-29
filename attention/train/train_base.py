@@ -37,7 +37,7 @@ class TrainBase:
         raise ValueError("cal_performance method should be implemented")
 
     @abstractmethod
-    def get_data_from_batch(self, src, trg, src_pad_idx, trg_pad_idx, device):
+    def get_data_from_batch(self, batch, arg, device):
         raise ValueError("get_data_from_batch method should be implemented")
 
     def train_epoch(self, train_data):
@@ -46,7 +46,7 @@ class TrainBase:
         total_loss, n_word_total, n_word_correct = 0, 0, 0
 
         for batch in tqdm(train_data, mininterval=2):
-            src_seq, trg_seq, gold = self.get_data_from_batch(batch.src, batch.trg, self.arg.src_pad_idx, self.arg.trg_pad_idx, self.device)
+            src_seq, trg_seq, gold = self.get_data_from_batch(batch, self.arg, self.device)
             model_input = {
                 "src_seq": src_seq,
                 "trg_seq": trg_seq

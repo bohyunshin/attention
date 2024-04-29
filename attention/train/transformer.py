@@ -47,11 +47,11 @@ class Train(TrainBase):
 
         return loss, n_correct, n_word
 
-    def get_data_from_batch(self, src, trg, src_pad_idx, trg_pad_idx, device):
-        # src.shape = (src_seq_len, batch_size)
-        # trg.shape = (trg_seq_len, batch_size)
-        src_seq = self.patch_src(src, src_pad_idx).to(device)
-        trg_seq, gold = map(lambda x: x.to(device), self.patch_trg(trg, trg_pad_idx))
+    def get_data_from_batch(self, batch, arg, device):
+        # batch.src.shape = (src_seq_len, batch_size)
+        # batch.trg.shape = (trg_seq_len, batch_size)
+        src_seq = self.patch_src(batch.src, arg.src_pad_idx).to(device)
+        trg_seq, gold = map(lambda x: x.to(device), self.patch_trg(batch.trg, arg.trg_pad_idx))
         return src_seq, trg_seq, gold
 
     def patch_src(self, src, pad_idx):

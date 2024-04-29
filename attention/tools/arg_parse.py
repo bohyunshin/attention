@@ -42,7 +42,7 @@ def parse_args():
     parser.add_argument('--data_src', type=str, default=None)
     parser.add_argument('--data_trg', type=str, default=None)
 
-    parser.add_argument('--max_len', type=int, default=100)
+    parser.add_argument('--max_len', type=int, default=200)
     parser.add_argument('--min_word_count', type=int, default=3)
     parser.add_argument('--keep_case', action='store_true')
     parser.add_argument('--share_vocab', action='store_true')

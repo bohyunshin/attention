@@ -24,7 +24,6 @@ def parse_args():
     args = parser.parse_args()
     return args
 
-MAX_LEN = 64
 
 class BERTDataset:
     def __init__(self,
@@ -71,8 +70,8 @@ class BERTDataset:
                 first = lines_dic[ids[i]].strip()
                 second = lines_dic[ids[i + 1]].strip()
 
-                qa_pairs.append(' '.join(first.split()[:MAX_LEN]))
-                qa_pairs.append(' '.join(second.split()[:MAX_LEN]))
+                qa_pairs.append(' '.join(first.split()[:self.seq_len]))
+                qa_pairs.append(' '.join(second.split()[:self.seq_len]))
                 pairs.append(qa_pairs)
         self.lines = pairs
 
@@ -264,5 +263,6 @@ class Preprocess(PreprocessBase):
             shuffle=True,
             pin_memory=True
         )
+        arg.n_vocab = len(self.train_dataset.tokenizer.vocab)
 
         return train_dataloader, validation_dataloader, arg
